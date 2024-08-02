@@ -13,7 +13,7 @@ function getPhoneNumber(userId) {
     return new Promise(function resolvePromise(resolve, reject) {
         setTimeout(function () {
             return resolve({
-                phone: '987123987',
+                number: '987123987',
             })
         }, 2000)
     })
@@ -29,27 +29,17 @@ function getAddress(userId) {
     })
 }
 
-const user = getUser()
+async function main() {
+    const user = await getUser()
+    const phone = await getPhoneNumber(user.id)
+    const address = await getAddress(user.id)
 
-user
-    .then(function (result) {
-        return getPhoneNumber(result.id)
-            .then(function (result1) {
-                return getAddress(result.id)
-                    .then(function (result2) {
-                        return {
-                            id: result.id,
-                            name: result.name,
-                            phone: result1.phone,
-                            address: result2.city
-                        }
-                    })
-            })
+    console.log(`
+            id: ${user.id}
+            Name: ${user.name}
+            Phone: ${phone.number}
+            Address: ${address.city}
+        `)
+}
 
-    })
-    .then(function (result) {
-        console.log('result', result)
-    })
-    .catch(function (error) {
-        console.error("Error", error)
-    })
+main()
