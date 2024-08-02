@@ -1,49 +1,55 @@
-function getUser(callback) {
-    setTimeout(function () {
-        return callback(null, {
-            id: 1,
-            name: 'Batman',
-        })
-    }, 1000)
-}
-
-function getPhoneNumber(userId, callback) {
-    setTimeout(function () {
-        return callback(null, {
-            phone: '987123987',
-        })
-    }, 2000)
-}
-
-function getAddress(userId, callback) {
-    setTimeout(function () {
-        return callback(null, {
-            city: 'gotham',
-        })
-    }, 2000)
-}
-
-const user = getUser(function resolveUser(error, user) {
-    if (error) {
-        console.error("Error on USER", error)
-        return
-    }
-    getPhoneNumber(user.id, function resolvePhoneNumber(error1, phone) {
-        if (error) {
-            console.error("Error on PHONE NUMBER", error)
-            return
-        }
-        getAddress(user.id, function resolveAddress(error2, address) {
-            if (error) {
-                console.error("Error on ADDRESS", error)
-                return
-            }
-
-            console.log(`
-                    Name: ${user.name}
-                    Phone: ${phone.phone}
-                    Address: ${address.city}
-                `)
-        })
+function getUser() {
+    return new Promise(function resolvePromise(resolve, reject) {
+        setTimeout(function () {
+            return resolve({
+                id: 1,
+                name: 'Batman',
+            })
+        }, 1000)
     })
-})
+}
+
+function getPhoneNumber(userId) {
+    return new Promise(function resolvePromise(resolve, reject) {
+        setTimeout(function () {
+            return resolve({
+                phone: '987123987',
+            })
+        }, 2000)
+    })
+}
+
+function getAddress(userId) {
+    return new Promise(function resolvePromise(resolve, reject) {
+        setTimeout(function () {
+            return resolve({
+                city: 'gotham',
+            })
+        }, 2000)
+    })
+}
+
+const user = getUser()
+
+user
+    .then(function (result) {
+        return getPhoneNumber(result.id)
+            .then(function (result1) {
+                return getAddress(result.id)
+                    .then(function (result2) {
+                        return {
+                            id: result.id,
+                            name: result.name,
+                            phone: result1.phone,
+                            address: result2.city
+                        }
+                    })
+            })
+
+    })
+    .then(function (result) {
+        console.log('result', result)
+    })
+    .catch(function (error) {
+        console.error("Error", error)
+    })
