@@ -29,10 +29,19 @@ function getAddress(userId) {
     })
 }
 
+// first test using console.time - 5.008s (without Promise.all)
+// second test using console.time - 3.008s (with Promise.all)
+
 async function main() {
+    console.time('playground-promise-timer')
     const user = await getUser()
-    const phone = await getPhoneNumber(user.id)
-    const address = await getAddress(user.id)
+    const result = await Promise.all([
+        getPhoneNumber(user.id),
+        getAddress(user.id)
+    ])
+
+    const phone = result[0]
+    const address = result[1]
 
     console.log(`
             id: ${user.id}
@@ -40,6 +49,8 @@ async function main() {
             Phone: ${phone.number}
             Address: ${address.city}
         `)
+
+    console.timeEnd('playground-promise-timer')
 }
 
 main()
